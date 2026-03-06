@@ -7,4 +7,4 @@ the [GenroPy](https://github.com/genropy/genropy) web framework.
 ## License
 
 Giojo.js is a derivative work of the Dojo Toolkit, released under the
-[BSD License](LICENSE). See the LICENSE file for details.
+[Apache License 2.0](LICENSE). See the [NOTICE](NOTICE) file for attribution.
