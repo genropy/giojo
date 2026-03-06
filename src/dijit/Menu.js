@@ -257,15 +257,20 @@ dojo.declare("dijit.Menu",
 			dijit.focus(savedFocus);
 			dijit.popup.close(self);
 		}
-		dijit.popup.open({
+		var popupKw = {
 			popup: this,
 			x: x,
 			y: y,
 			onExecute: closeAndRestoreFocus,
 			onCancel: closeAndRestoreFocus,
 			orient: this.isLeftToRight() ? 'L' : 'R'
-		});
-		this.focus();
+		};
+		this.onOpeningPopup(popupKw);
+		dijit.popup.open(popupKw);
+		var that = this;
+		setTimeout(function(){
+			that.focus();
+		},1);
 
 		this._onBlur = function(){
 			this.inherited('_onBlur', arguments);
@@ -275,6 +280,10 @@ dojo.declare("dijit.Menu",
 			// don't try to restore focus; user has clicked another part of the screen
 			// and set focus there
 		}
+	},
+
+	onOpeningPopup: function(/*Object*/ popupKw){
+		// summary: hook called before opening popup, allows customization of popupKw
 	},
 
 	onOpen: function(/*Event*/ e){

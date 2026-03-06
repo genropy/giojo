@@ -9,5 +9,6 @@ dojo.require("dojo._base.json");
 dojo.require("dojo._base.array");
 dojo.require("dojo._base.Color");
 dojo.requireIf(dojo.isBrowser, "dojo._base.browser");
+dojo.require("dojo.giojo");
 
 }
