@@ -5,7 +5,7 @@
   "main": "src/dojo/dojo.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/softwell/giojo.git"
+    "url": "https://github.com/genropy/giojo.git"
   },
   "keywords": [
     "giojo",
@@ -17,5 +17,5 @@
   ],
   "author": "Softwell S.r.l.",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/softwell/giojo"
+  "homepage": "https://github.com/genropy/giojo"
 }
