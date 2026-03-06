@@ -1,0 +1,21 @@
+{
+  "name": "giojo",
+  "version": "0.1.0",
+  "description": "A JavaScript toolkit derived from the Dojo Toolkit, customized for GenroPy",
+  "main": "src/dojo/dojo.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/softwell/giojo.git"
+  },
+  "keywords": [
+    "giojo",
+    "dojo",
+    "toolkit",
+    "genropy",
+    "ui",
+    "widgets"
+  ],
+  "author": "Softwell S.r.l.",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/softwell/giojo"
+}
