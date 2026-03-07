@@ -17,16 +17,10 @@ dijit.getDocumentWindow = function(doc){
 		var fix=function(win){
 			win.document._parentWindow=win;
 			for(var i=0; i<win.frames.length; i++){
-				try{
-					fix(win.frames[i]);
-				}catch(e){
-				}
+				fix(win.frames[i]);
 			}
 		}
-		try{
-			fix(window.top);
-		}catch(e){
-		}
+		fix(window.top);
 	}
 
 	//In some IE versions (at least 6.0), document.parentWindow does not return a

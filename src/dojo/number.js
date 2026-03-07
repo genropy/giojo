@@ -527,7 +527,7 @@ dojo.number._integerRegexp = function(/*dojo.number.__IntegerRegexpFlags?*/flags
 	var numberRE = dojo.regexp.buildGroupRE(flags.separator,
 		function(sep){
 			if(!sep){
-				return "(?:\\d+)";
+				return "(?:0|[1-9]\\d*)";
 			}
 
 			sep = dojo.regexp.escapeString(sep);

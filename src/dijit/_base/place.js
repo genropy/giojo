@@ -207,16 +207,7 @@ dijit.placeOnScreenAroundElement = function(
 		});
 	}
 
-	var result = dijit._place(node, choices, layoutNode);
-	var bodyWidth = dojo.body().clientWidth;
-	var coords = dojo.coords(node);
-	var delta = bodyWidth-(coords.l+coords.w+5);
-	if(delta<0){
-		node.style.left = parseInt(node.style.left)+delta+'px';
-		result.w = result.w + result.overflow;
-		result.overflow = null;
-	}
-	return result;
+	return dijit._place(node, choices, layoutNode);
 }
 
 }

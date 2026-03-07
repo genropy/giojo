@@ -152,9 +152,28 @@ dojo.declare("dijit.form._FormWidget", [dijit._Widget, dijit._Templated],
 		//	Update the visual state of the widget by setting the css classes on this.domNode
 		//  (or this.stateNode if defined) by combining this.baseClass with
 		//	various suffixes that represent the current widget state(s).
-
-		// Guard: skip if neither stateNode nor domNode exists yet
-		if(!(this.stateNode || this.domNode)){ return; }
+		//
+		//	In the case where a widget has multiple
+		//	states, it sets the class based on all possible
+		//  combinations.  For example, an invalid form widget that is being hovered
+		//	will be "dijitInput dijitInputInvalid dijitInputHover dijitInputInvalidHover".
+		//
+		//	For complex widgets with multiple regions, there can be various hover/active states,
+		//	such as "Hover" or "CloseButtonHover" (for tab buttons).
+		//	This is controlled by a stateModifier="CloseButton" attribute on the close button node.
+		//
+		//	The widget may have one or more of the following states, determined
+		//	by this.state, this.checked, this.valid, and this.selected:
+		//		Error - ValidationTextBox sets this.state to "Error" if the current input value is invalid
+		//		Checked - ex: a checkmark or a ToggleButton in a checked state, will have this.checked==true
+		//		Selected - ex: currently selected tab will have this.selected==true
+		//
+		//	In addition, it may have one or more of the following states,
+		//	based on this.disabled and flags set in _onMouse (this._active, this._hovering, this._focused):
+		//		Disabled	- if the widget is disabled
+		//		Active		- if the mouse (or space/enter key?) is being pressed down
+		//		Focused		- if the widget has focus
+		//		Hover		- if the mouse is over the widget
 
 		// Get original (non state related, non baseClass related) class specified in template
 		if(!("staticClass" in this)){

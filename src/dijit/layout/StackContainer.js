@@ -363,7 +363,11 @@ dojo.declare(
 			// summary:
 			//   Called whenever one of my child buttons [X] is pressed in an attempt to close a page
 			var container = dijit.byId(this.containerId);
-			container.deletePage(page);
+			container.closeChild(page);
+			var b = this.pane2button[this._currentChild];
+			if(b){
+				dijit.focus(b.focusNode || b.domNode);
+			}
 		},
 		
 		// TODO: this is a bit redundant with forward, back api in StackContainer
