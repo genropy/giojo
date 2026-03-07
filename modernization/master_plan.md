@@ -74,6 +74,191 @@ Da questo momento giojo.js e' in produzione e disponibile ovunque.
 
 ---
 
+## Fase 0b — Split e documentazione del codice GenroPy JS
+
+Prima di modernizzare, **organizzare e documentare** il codice com'e'.
+Puro refactoring strutturale: split dei file grandi in moduli tematici
++ commenti JSDoc. Zero modifiche funzionali.
+
+### Principio
+
+- **Solo split e commenti** — il codice non cambia di una virgola
+- **Ogni step e' un commit** — deployabile e reversibile
+- **I file originali diventano aggregatori** — includono i sotto-moduli
+- **JSDoc su ogni classe e metodo pubblico** — cosa fa, parametri, ritorno
+
+### Stato attuale: 48.156 righe in 24 file
+
+I file piu' grandi hanno confini naturali chiari (classi `dojo.declare`).
+
+| File | Righe | Classi | Split proposto |
+|------|-------|--------|----------------|
+| `genro_components.js` | 8.075 | 75 classi widget | Per famiglia funzionale |
+| `genro_widgets.js` | 6.056 | 57 classi widget | Per tipo (HTML/Dojo/form/layout) |
+| `genro_grid.js` | 5.051 | 5 classi | Per classe |
+| `genro_frm.js` | 3.328 | 8 classi | Handler / Validator / FormStores |
+| `gnrbag.js` | 2.576 | 7 classi | BagNode / Bag / Resolver |
+| `genro.js` | 2.493 | 2 classi | GenroClient sezioni logiche |
+| `genro_extra.js` | 2.418 | — | Per area funzionale |
+| `genro_wdg.js` | 2.324 | 5 classi | WdgHandler / RowEditor / GridEditor / FilterMgr |
+| `gnrlang.js` | 2.232 | — | Utility per categoria |
+| `gnrdomsource.js` | 2.100 | 3 classi | DomSourceNode / DomSource |
+| `genro_dom.js` | 2.080 | 1 classe | GnrDomHandler sezioni logiche |
+
+### Step 0b.1 — `genro_components.js` (8.075 righe → ~8 file)
+
+Il file piu' grande. 75 classi widget, tutte `gnr.widgets.*`.
+Split per famiglia funzionale:
+
+| Nuovo file | Classi | Righe circa |
+|------------|--------|-------------|
+| `genro_cmp_base.js` | `gnrwdg` (classe base) | ~100 |
+| `genro_cmp_palette.js` | `Palette`, `PalettePane`, `PaletteGrid`, `PaletteTree`, `PaletteMap`, `PaletteGroup`, `PaletteImporter`, `PaletteBag*Editor` | ~1.200 |
+| `genro_cmp_frame.js` | `FramePane`, `FrameForm`, `BoxForm`, `DocumentFrame`, `TreeFrame` | ~600 |
+| `genro_cmp_editor.js` | `MultiValueEditor`, `BagNodeEditor`, `BagEditor`, `FlatBagEditor`, `QuickEditor`, `ExtendedCkeditor`, `CodeEditor` | ~800 |
+| `genro_cmp_grid.js` | `QuickGrid`, `TreeGrid`, `GridGallery`, `IncludedView` related | ~1.000 |
+| `genro_cmp_store.js` | `SelectionStore`, `BagStore`, `_Collection`, `BagRows`, `RpcBase`, `Selection`, `VirtualSelection` | ~1.300 |
+| `genro_cmp_form.js` | `SearchBox`, `SlotBar`, `SlotButton`, `UserObject*`, `DropUploader*`, `StackButtons` | ~1.500 |
+| `genro_cmp_misc.js` | `TooltipPane`, `MenuDiv`, `Color*`, `Video*`, `ComboArrow`, `Password*`, resto | ~1.500 |
+
+Il file originale `genro_components.js` diventa un aggregatore che
+include tutti i sotto-file.
+
+### Step 0b.2 — `genro_widgets.js` (6.056 righe → ~5 file)
+
+57 classi widget. Split per tipo:
+
+| Nuovo file | Classi | Righe circa |
+|------------|--------|-------------|
+| `genro_wdg_html.js` | `baseHtml`, `htmliframe`, `flexbox`, `gridbox`, `labledbox`, `iframe`, `canvas`, `video`, `baseExternalWidget`, `LightButton`, `uploadable`, `img`, `embed` | ~1.300 |
+| `genro_wdg_layout.js` | `baseDojo`, `Dialog`, `StackContainer`, `TabContainer`, `BorderContainer`, `TitlePane`, `FloatingPane`, `ContentPane`, `AccordionPane`, `ResizeHandle` | ~1.500 |
+| `genro_wdg_form.js` | `_BaseTextBox`, `TextBox`, `DateTextBox`, `TimeTextBox`, `NumberTextBox`, `CurrencyTextBox`, `Slider*`, `CheckBox`, `RadioButton`, `SimpleTextarea` | ~1.200 |
+| `genro_wdg_combo.js` | `BaseCombo`, `FilteringSelect`, `ComboBox`, `DynamicBaseCombo`, `dbBaseCombo`, `LocalBaseCombo`, `RemoteBaseCombo`, `db/Remote/CallBackSelect`, `DropDownButton` | ~1.200 |
+| `genro_wdg_menu.js` | `Menu`, `Menuline`, `Tooltip`, `Button`, `_ButtonLogic`, `Calendar`, `ProgressBar`, `Editor`, `ColorPicker`, `ColorPalette`, `fileInput*`, `GoogleMap`, `StaticMap` | ~900 |
+
+### Step 0b.3 — `genro_grid.js` (5.051 righe → 3 file)
+
+| Nuovo file | Classi | Righe circa |
+|------------|--------|-------------|
+| `genro_grid_base.js` | `DojoGrid` (logica base, celle, eventi) | ~2.200 |
+| `genro_grid_virtual.js` | `VirtualGrid`, `VirtualStaticGrid` | ~1.200 |
+| `genro_grid_included.js` | `IncludedView`, `NewIncludedView` | ~1.600 |
+
+### Step 0b.4 — `genro_frm.js` (3.328 righe → 3 file)
+
+| Nuovo file | Classi | Righe circa |
+|------------|--------|-------------|
+| `genro_frm_handler.js` | `GnrFrmHandler` | ~2.100 |
+| `genro_frm_validator.js` | `GnrValidator` | ~330 |
+| `genro_frm_stores.js` | `formstores.Base`, `.SubForm`, `.Item`, `.Collection`, `.Hierarchical` | ~900 |
+
+### Step 0b.5 — `gnrbag.js` (2.576 righe → 3 file)
+
+| Nuovo file | Classi | Righe circa |
+|------------|--------|-------------|
+| `gnrbag_node.js` | `GnrBagNode` | ~530 |
+| `gnrbag_bag.js` | `GnrBag` | ~1.750 |
+| `gnrbag_resolver.js` | `GnrBagResolver`, `GnrBagFormula`, `GnrBagGetter`, `GnrBagCbResolver` | ~300 |
+
+### Step 0b.6 — `genro_wdg.js` (2.324 righe → 4 file)
+
+| Nuovo file | Classi | Righe circa |
+|------------|--------|-------------|
+| `genro_wdg_handler.js` | `GnrWdgHandler` | ~550 |
+| `genro_wdg_row_editor.js` | `RowEditor` | ~160 |
+| `genro_wdg_grid_editor.js` | `GridEditor` | ~1.100 |
+| `genro_wdg_grid_mgr.js` | `GridFilterManager`, `GridChangeManager` | ~400 |
+
+### Step 0b.7 — `gnrlang.js` (2.232 righe → per categorie)
+
+Non ha classi `dojo.declare`, sono funzioni globali. Split per categoria:
+
+| Nuovo file | Contenuto |
+|------------|-----------|
+| `gnrlang_string.js` | Manipolazione stringhe |
+| `gnrlang_object.js` | objectUpdate, objectExtract, objectPop, etc. |
+| `gnrlang_format.js` | Formattazione, conversione tipi |
+| `gnrlang_misc.js` | Utility varie |
+
+### Step 0b.8 — File 1.500-2.500 righe (split dove utile)
+
+| File | Split |
+|------|-------|
+| `gnrdomsource.js` (2.100) | `gnrdomsource_node.js` + `gnrdomsource_bag.js` |
+| `genro_dom.js` (2.080) | Per sezione logica del `GnrDomHandler` |
+| `genro.js` (2.493) | `GenroClient` per aree (init, data, navigation, misc) |
+
+### Meccanismo di aggregazione
+
+Il file originale resta come aggregatore. Esempio per `gnrbag.js`:
+
+```javascript
+// gnrbag.js — Aggregator (original file preserved for compatibility)
+// Actual code split into:
+//   gnrbag_node.js     — GnrBagNode class
+//   gnrbag_bag.js      — GnrBag class
+//   gnrbag_resolver.js — GnrBagResolver and subclasses
+
+// The script tags for sub-modules are added in the GenroPy bootstrap.
+// This file is kept empty for backward compatibility with any direct references.
+```
+
+In alternativa, se il loading order e' gestito dal bootstrap HTML di GenroPy,
+i nuovi file vengono aggiunti direttamente li' e il file originale viene
+svuotato progressivamente.
+
+### Commenti JSDoc
+
+Ogni classe e metodo pubblico riceve un commento JSDoc:
+
+```javascript
+/**
+ * GnrBagNode — Nodo singolo nella gerarchia Bag.
+ *
+ * Contiene label, value, attributi e opzionalmente un resolver
+ * per il lazy loading. Il valore puo' essere scalare o un'altra
+ * GnrBag per creare strutture gerarchiche.
+ *
+ * @class gnr.GnrBagNode
+ * @param {GnrBag} parentbag - Bag contenitore
+ * @param {string} label - Nome/etichetta del nodo
+ * @param {*} value - Valore (scalare o GnrBag)
+ * @param {Object} attr - Attributi del nodo
+ * @param {GnrBagResolver} resolver - Resolver per lazy loading
+ */
+dojo.declare("gnr.GnrBagNode", null, {
+
+    /**
+     * Ritorna il valore del nodo, risolvendo il resolver se necessario.
+     *
+     * Se il nodo ha un resolver e il cache e' scaduto, chiama
+     * resolver.resolve() che puo' fare una chiamata al server.
+     *
+     * @param {string} mode - 'static' per valore cached, 'reload' per forzare
+     * @param {Object} optkwargs - Parametri extra per il resolver
+     * @returns {*} Il valore del nodo
+     */
+    getValue: function(mode, optkwargs) {
+```
+
+### Ordine di esecuzione
+
+```
+Step 0b.1: genro_components.js → 8 file     (il piu' grande, 75 classi)
+Step 0b.2: genro_widgets.js    → 5 file     (57 classi widget)
+Step 0b.3: genro_grid.js       → 3 file     (5 classi grid)
+Step 0b.4: genro_frm.js        → 3 file     (8 classi form)
+Step 0b.5: gnrbag.js           → 3 file     (7 classi core)
+Step 0b.6: genro_wdg.js        → 4 file     (5 classi handler)
+Step 0b.7: gnrlang.js          → 4 file     (utility per categoria)
+Step 0b.8: gnrdomsource/dom/genro → split logici
+```
+
+Ogni step e' un commit separato. Il file originale resta come aggregatore.
+Nessuna modifica funzionale. Solo split e commenti.
+
+---
+
 ## Fase 1 — API DOM e utility a rischio zero
 
 Implementare in giojo.js gli equivalenti nativi delle API Dojo piu'
