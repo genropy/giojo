@@ -86,10 +86,11 @@ Puro refactoring strutturale: split dei file grandi in moduli tematici
 - **Ogni step e' un commit** — deployabile e reversibile
 - **I file originali diventano aggregatori** — includono i sotto-moduli
 - **JSDoc su ogni classe e metodo pubblico** — cosa fa, parametri, ritorno
+- **Soglia**: ogni sotto-modulo deve stare sotto le **1.000 righe**
 
-### Stato attuale: 48.156 righe in 24 file
+### Stato attuale: 45.663 righe in 23 file — 15 file superano le 1.000 righe
 
-I file piu' grandi hanno confini naturali chiari (classi `dojo.declare`).
+I file >1.000 righe hanno confini naturali chiari (classi `dojo.declare`).
 
 | File | Righe | Classi | Split proposto |
 |------|-------|--------|----------------|
@@ -104,6 +105,10 @@ I file piu' grandi hanno confini naturali chiari (classi `dojo.declare`).
 | `gnrlang.js` | 2.232 | — | Utility per categoria |
 | `gnrdomsource.js` | 2.100 | 3 classi | DomSourceNode / DomSource |
 | `genro_dom.js` | 2.080 | 1 classe | GnrDomHandler sezioni logiche |
+| `genro_dev.js` | 1.564 | — | Inspector / DevTools per sezione |
+| `genro_dlg.js` | 1.444 | 1 classe | GnrDlgHandler per tipo dialog |
+| `genro_patch.js` | 1.423 | — | Patch per area funzionale |
+| `genro_rpc.js` | 1.046 | 2 classi | Resolver / ServerCall / Utilities |
 
 ### Step 0b.1 — `genro_components.js` (8.075 righe → ~8 file)
 
@@ -180,13 +185,41 @@ Non ha classi `dojo.declare`, sono funzioni globali. Split per categoria:
 | `gnrlang_format.js` | Formattazione, conversione tipi |
 | `gnrlang_misc.js` | Utility varie |
 
-### Step 0b.8 — File 1.500-2.500 righe (split dove utile)
+### Step 0b.8 — `gnrdomsource.js`, `genro_dom.js`, `genro.js`
 
 | File | Split |
 |------|-------|
 | `gnrdomsource.js` (2.100) | `gnrdomsource_node.js` + `gnrdomsource_bag.js` |
 | `genro_dom.js` (2.080) | Per sezione logica del `GnrDomHandler` |
 | `genro.js` (2.493) | `GenroClient` per aree (init, data, navigation, misc) |
+
+### Step 0b.9 — `genro_dev.js` (1.564 righe → 2 file)
+
+| Nuovo file | Contenuto | Righe circa |
+|------------|-----------|-------------|
+| `genro_dev_inspector.js` | Inspector DOM, tree viewer, debug panels | ~800 |
+| `genro_dev_tools.js` | Utility sviluppo, logging, diagnostica | ~750 |
+
+### Step 0b.10 — `genro_dlg.js` (1.444 righe → 2 file)
+
+| Nuovo file | Contenuto | Righe circa |
+|------------|-----------|-------------|
+| `genro_dlg_base.js` | `GnrDlgHandler`, dialog standard, confirm, alert | ~750 |
+| `genro_dlg_advanced.js` | Dialog specializzati (file picker, color, form dialog) | ~700 |
+
+### Step 0b.11 — `genro_patch.js` (1.423 righe → 2 file)
+
+| Nuovo file | Contenuto | Righe circa |
+|------------|-----------|-------------|
+| `genro_patch_widgets.js` | Patch su widget dijit/dojox | ~750 |
+| `genro_patch_core.js` | Patch su comportamenti core | ~670 |
+
+### Step 0b.12 — `genro_rpc.js` (1.046 righe → 2 file)
+
+| Nuovo file | Contenuto | Righe circa |
+|------------|-----------|-------------|
+| `genro_rpc_resolver.js` | `GnrRemoteResolver`, resolver relazionali | ~500 |
+| `genro_rpc_call.js` | `_serverCall`, `_serverCall_execute`, utilities RPC | ~550 |
 
 ### Meccanismo di aggregazione
 
@@ -244,15 +277,21 @@ dojo.declare("gnr.GnrBagNode", null, {
 ### Ordine di esecuzione
 
 ```
-Step 0b.1: genro_components.js → 8 file     (il piu' grande, 75 classi)
-Step 0b.2: genro_widgets.js    → 5 file     (57 classi widget)
-Step 0b.3: genro_grid.js       → 3 file     (5 classi grid)
-Step 0b.4: genro_frm.js        → 3 file     (8 classi form)
-Step 0b.5: gnrbag.js           → 3 file     (7 classi core)
-Step 0b.6: genro_wdg.js        → 4 file     (5 classi handler)
-Step 0b.7: gnrlang.js          → 4 file     (utility per categoria)
-Step 0b.8: gnrdomsource/dom/genro → split logici
+Step 0b.1:  genro_components.js  → 8 file    (8.075 righe, 75 classi)
+Step 0b.2:  genro_widgets.js     → 5 file    (6.056 righe, 57 classi)
+Step 0b.3:  genro_grid.js        → 3 file    (5.051 righe, 5 classi)
+Step 0b.4:  genro_frm.js         → 3 file    (3.328 righe, 8 classi)
+Step 0b.5:  gnrbag.js            → 3 file    (2.576 righe, 7 classi)
+Step 0b.6:  genro_wdg.js         → 4 file    (2.324 righe, 5 classi)
+Step 0b.7:  gnrlang.js           → 4 file    (2.232 righe, utility)
+Step 0b.8:  gnrdomsource/dom/genro → split   (6.673 righe, 3 file)
+Step 0b.9:  genro_dev.js         → 2 file    (1.564 righe)
+Step 0b.10: genro_dlg.js         → 2 file    (1.444 righe)
+Step 0b.11: genro_patch.js       → 2 file    (1.423 righe)
+Step 0b.12: genro_rpc.js         → 2 file    (1.046 righe)
 ```
+
+**Totale**: 15 file >1.000 righe → ~50 sotto-moduli, tutti <1.000 righe.
 
 Ogni step e' un commit separato. Il file originale resta come aggregatore.
 Nessuna modifica funzionale. Solo split e commenti.
